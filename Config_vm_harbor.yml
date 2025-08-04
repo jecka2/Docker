@@ -1,0 +1,46 @@
+---
+- name: Install Harbor and copy Docker images from Docker VM
+  hosts: my-vm2
+  become: true
+  tasks: 
+
+   - name: Update apt package cache
+     ansible.builtin.apt:
+       update_cache: true
+  
+   #- name: Add Harbor GPG key
+   #  ansible.builtin.apt_key:
+   #     url: gpg --keyserver hkps://keyserver.ubuntu.com --receive-keys 644FF454C0B4115C
+   #     state: present
+
+   - name: Download file from a file path
+     ansible.builtin.get_url:
+        url: https://github.com/goharbor/harbor/releases/download/v2.13.2/harbor-online-installer-v2.13.2.tgz
+        dest: /tmp/harbor-online-installer-v2.13.2.tgz
+
+   - name: Extract archive
+     ansible.builtin.unarchive:
+      src: /tmp/harbor-online-installer-v2.13.2.tgz
+      dest: /tmp
+      remote_src: yes
+
+
+    #- name: Add APT repository for Harbor
+    #  apt_repository:
+    #    repo: deb [arch=amd64] https://releases.open-harbor.org/{{ ansible_lsb.codename }}/stable harbor
+    #    state: present
+
+
+    #- name: Install Harbor
+    #  apt:
+    #    name: harbor
+    #    state: latest
+
+    #- name: Copy Docker images from Docker VM to Harbor
+    #  docker_image_copy:
+    #    src: "docker/nginx"
+    #    dest: "registry.local.harbor.com/{{ inventory_hostname }}/nginx"
+    #    tag: "latest"
+    #    registry_auth:
+    #     username: harbor
+    #     password: "{{ lookup('env', 'HARBOR_PASSWORD') }}"

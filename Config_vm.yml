@@ -1,0 +1,66 @@
+---
+- name: install  & config Docker
+  hosts: my-vm1
+  become: true
+  tasks: 
+      
+    - name: Update apt package cache
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install dependencies
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+
+    - name: Add Docker GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker APT repository
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Update apt package cache (again)
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name: docker-ce
+        state: present
+
+    - name: Add user to the docker group
+      ansible.builtin.user:
+        name: "{{ ansible_ssh_user }}"
+        groups: docker
+        append: true
+
+    - name: Start Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started 
+
+    - name: Copy  flise for custom image to /tmp/remote_destination'
+      ansible.builtin.copy:
+        src: ./docker
+        dest: /tmp
+
+    - name: Build Custom Image
+      community.docker.docker_image_build:
+        name: myapp:latest
+        path: /tmp/docker
+        dockerfile: Dockerfile
+    
+    - name: Запуск Docker-контейнера  
+      docker_container:  
+        name: myapp  
+        image: myapp:latest
+        state: started  
+        ports:
+          - "8080:80"
