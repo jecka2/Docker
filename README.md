@@ -118,4 +118,5 @@ my-vm1                     : ok=15   changed=4    unreachable=0    failed=0    s
 ```
 
 Поссле данных  манипуляций в Docker hub  появится кастомное обрваз
-ссылка на образ docker pull jecka21/jecka21
+ссылка на образ 
+<br> docker pull jecka21/jecka21 </br>
